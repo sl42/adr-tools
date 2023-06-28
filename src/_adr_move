@@ -10,7 +10,7 @@ adr_dir=$("$adr_bin_dir/_adr_dir")
 function move {
   source_num=$(printf "%04d" $1)
   source=$("$adr_bin_dir/_adr_file" "${adr_dir}/${source_num}")
-  if [ ! -f "$source" ] ;
+  if [ ! -f "$source" ];
   then
     return
   fi
@@ -82,7 +82,7 @@ then
   before=$(expr $1 - 1)
   for i in $(seq $before $2);
   do
-  plusone=$(expr  $i + 1)
+  plusone=$(expr $i + 1)
   move $1 $plusone
   done
   move $end $2

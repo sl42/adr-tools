@@ -6,7 +6,7 @@ eval "$($(dirname $0) /adr-config)"
 ##
 ## Moves the ADR with the given 'SOURCE' number to the 'TARGET' ADR number.
 ## SOURCE and TARGET are both a reference numbers to an ADR.
-## This also moves the ADRs away which otherwise would obtains the same ADR 
+## This also moves the ADRs away which otherwise would obtains the same ADR
 ## number so that every ADR number still is unique.
 ##
 ## E.g. to move the ADR 12 to ADR 10

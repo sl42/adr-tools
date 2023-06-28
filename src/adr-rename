@@ -42,7 +42,7 @@ srcfile=$(find "$dstdir" -name "$srcfile_pattern")
 if [ "$srcfile" != "" ] ; then
     result=`echo $(git show HEAD~1:$srcfile 1>/dev/null 2>&1)$?`
     echo "result: $result"
-    if [ "0" = "$result" ] ; then
+    if [ "0" == "$result" ] ; then
         echo "git move '$srcfile' --> '$dstfile'"
         git mv "$srcfile" "$dstfile"
     else
