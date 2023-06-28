@@ -55,7 +55,8 @@ function index() {
 }
 
 echo "digraph {"
-echo "  node [shape=plaintext];"
+##echo "  node [shape=plaintext];"
+echo "  node [shape=box];"
 
 echo "  subgraph {"
 for f in $("$adr_bin_dir/adr-list")
@@ -74,7 +75,7 @@ echo "  }"
 for f in $("$adr_bin_dir/adr-list")
 do
 	n=$(index "$f")
-	"$adr_bin_dir/_adr_links" "$f" | grep -Ev " by$" | sed -E -e 's/^([0-9]+)=(.+)$/  _'"$n"' -> _\1 [label="\2", weight=0]/;'
+	"$adr_bin_dir/_adr_links" "$f" | grep -Ev " by$" | sed -E -e 's/^([0-9]+)=(.+)$/  _'"$n"' -> _\1 [label="\2", weight=0 color="blue"]/;'
 done
 
 echo "}"

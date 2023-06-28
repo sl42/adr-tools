@@ -58,9 +58,9 @@ do
         s)
             superceded+=("$OPTARG")
             ;;
-		l)
-			links+=("$OPTARG")
-			;;
+		    l)
+		    	  links+=("$OPTARG")
+		    	  ;;
         --)
             break
             ;;

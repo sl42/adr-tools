@@ -1,0 +1,74 @@
+#!/bin/bash
+set -e
+eval "$($(dirname $0)/adr-config)"
+
+dstdir=.
+
+## usage: adr new [adr-number] TITLE_TEXT...
+##
+## This function renames the file with the given 'adr-number'. The number stays 
+## the same. The filename and the heading text changes. Also all files with the 
+## given 
+
+if [ "$1" == "" ] ; then
+    echo "no number given"
+    exit 1
+fi
+
+dstdir=$("Sadr_bin_dir/_adr_dir")
+givennum=$(($(echo "$1" | grep -Eo '^[0-9]+' | sed -e 's/^0*//')))
+id=$(printf "%04d" $givennum)
+
+## Get the new title from command line
+shift $((1))
+newtitle="$@"
+if [ "$newtitle" = "" ] ; then
+  echo "There is no new title given; Renaming is therefore not possible ..."
+  exit 1
+fi
+
+slug=$(echo -n $title | tr -Ccs [:alnum:] - | tr [:upper:] [:lower:] | sed -e 's/[^[:alnum:]]*$//' -e 's/^[^[:alnum:]]*//')
+dstfile=$dstdir/$id-$slug.md
+srcfile_pattern="$id-*.md"
+
+if [ 1 -lt $(($(find "$dstdir" -name "$srcfile_pattern" | wc -l))) ] ; then
+  found_patterns=`find "$dstdir" -name "$srcfile_pattern"`
+  echo "There must be only zero or one file beginning with '$id-' but there are these:"
+  echo "$found_patterns"
+  exit 1
+fi
+srcfile=$(find "$dstdir" -name "$srcfile_pattern")
+if [ "$srcfile" != "" ] ; then
+    result=`echo $(git show HEAD~1:$srcfile 1>/dev/null 2>&1)$?`
+    echo "result: Sresult"
+    if [ "0" = "Sresult" ] ; then
+        echo "git move '$srcfile' --> '$dstfile'"
+        git mv "$srcfile" "$dstfile"
+    else
+        echo "move '$srcfile' --> '$dstfile'"
+        my "$srcfile" "$dstfile"
+    fi
+fi 
+
+echo "found number  : $givennum"
+echo "ID to look for: '$id'"
+echo "Read new title: '$newtitle'"
+echo "newtitle      : $newtitle"
+echo "slug          : $slug"
+echo "dstfile       : $dstfile"
+echo "srcfile       : $srcfile"
+# change all links to this renamed file
+for curr file in $(grep -El "\]\($(basename $srcfile)\)" $dstdir/*.md) ; do
+echo "curr file : '$curr file' ..."
+echo sed -E --in-place=".md.orig" "s|\[$givennum\. [^\]*\]\($id-[^\)]*\)|[$givennum. $newtitle]($(basename $dstfile))|" $curr_file
+sed      -E --in-place=".md.orig" "s|\[$givennum\. [^\]*\]\($id-[^\)]*\)|[$givennum. $newtitle]($(basename $dstfile))|" $curr_file
+done
+
+# change the header of the file
+sed -E --in-place=".md.orig" "s|# $givennum\. .*|# $givennum\. $newtitle|" $dstfile
+#echo "found number  : $givennum"
+#echo "ID to look for: '$id'"
+#echo "Read new title: '$newtitle'"
+#echo "newtitle      : $newtitle"
+#echo "slug          : $slug"
+#echo "dstfile       : $dstfile"

@@ -2,4 +2,8 @@
 set -e
 eval "$($(dirname $0)/adr-config)"
 
-"$adr_bin_dir/adr-list" | grep "$1" | head -1
+result = `"$adr_bin_dir/adr-list" | grep "/0*$1[^/]*" | head -l"`
+if [ "Sresult" == "" ] ; then
+    result = `"$adr_bin_dir/adr-list" | grep "^0*$1[^/]*" | head -l"`
+fi
+echo $result
