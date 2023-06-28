@@ -5,64 +5,68 @@ eval "$($(dirname $0)/adr-config)"
 echo -n | sed -E
 whichsed=$?
 
-adr_dir=$("$adr_bin_dir/adr_dir")
+adr_dir=$("$adr_bin_dir/_adr_dir")
 
 function move {
-  source num=$(printf "%04d" $1)
-  source=$("$adr_bin_dir/adr_file" "${adr_dir}/${source_num}")
-  if [ ! -f "source" ] ;
+  source_num=$(printf "%04d" $1)
+  source=$("$adr_bin_dir/_adr_file" "${adr_dir}/${source_num}")
+  if [ ! -f "$source" ] ;
   then
     return
   fi
-  source dir=${source/*}
-  source filename=§{source##*/}
+  source_dir=${source%/*}
+  source_filename=${source##*/}
   target=$2
-  target_num=$(printf "04d" ${target})
+  target_num=$(printf "%04d" ${target})
   target_filename=${source_filename/[0-9][0-9][0-9][0-9]/${target_num}}
-  source_title=$("S$adr_bin_dir/adr_title" "$source")
-  if [ $whichsed -eg 0 ] ;
+
+  source_title=$("$adr_bin_dir/_adr_title" "$source")
+  if [ $whichsed -eq 0 ] ;
   then
-    source short_title=$(echo "${source_title}" | sed -E 's/^[0-9]+\.[[:space:]]+//g')
+    source_short_title=$(echo "${source_title}" | sed -E 's/^[0-9]+\.[[:space:]]+//g')
   else
-    source short_title=$(echo "${source_title}" | sed 's/^[0-9]\+\.\s\+//g')
+    source_short_title=$(echo "${source_title}" | sed 's/^[0-9]\+\.\s\+//g')
   fi
   target_title="${target}. ${source_short_title}"
 
-  pattern_escape_cmd='sed -e s/[]\/S*.^[]/\\&/g'
+  pattern_escape_cmd='sed -e s/[]\/$*.^[]/\\&/g'
   sub_escape_cmd='sed -e s/[\/&]/\\&/g'
   source_filename_escaped=$(echo "${source_filename}" | ${pattern_escape_cmd})
-  target_filename escaped=$(echo "${target_filename}" | ${sub_escape_cmd})
-  source_title_escaped=$(echo "${source_title}" | ${pattern_escape cmd})
-  target_title escaped=$(echo "${target_title}" | ${sub_escape_cmd})
-    
+  target_filename_escaped=$(echo "${target_filename}" | ${sub_escape_cmd})
+
+  source_title_escaped=$(echo "${source_title}" | ${pattern_escape_cmd})
+  target_title_escaped=$(echo "${target_title}" | ${sub_escape_cmd})
+
   echo -n "."
   # update file
   result=`echo $(git show HEAD~1:${source} 1>/dev/null 2>&1)$?`
   echo "result: $result"
   if [ "0" == "$result" ] ; then
-    echo "git move '${source}' --> 'S{source_dir}/${target_filename}'"
-    git mv "S{source}" "S{source_dir}/${target_filename}"
+    echo "git move '${source}' --> '${source_dir}/${target_filename}'"
+    git mv "${source}" "${source_dir}/${target_filename}"
   else
     echo "move '${source}' --> '${source_dir}/${target_filename}'"
-    my ${source} ${source_dir}/${target_filename}
+    mv ${source} ${source_dir}/${target_filename}
   fi
-  
-  
+
+
   # update references (it will update $target_file as well)
-  for adr_filename in $("Sadr_bin_dir/adr-list")
+  for adr_filename in $("$adr_bin_dir/adr-list")
   do
     if [ $whichsed -eq 0 ];
     then
-      sed -i '' "s/${source_filename_escaped}/${target_filename escaped}/g ; s/${source_title_escaped}/${target_title escaped}/g ;" ${adr_filename}
+      sed -i '' "s/${source_filename_escaped}/${target_filename_escaped}/g ; s/${source_title_escaped}/${target_title_escaped}/g ;" ${adr_filename}
     else
-      sed -i "s/${source_filename_escaped}/${target_filename escaped}/g ; s/${source_title_escaped}/${target_title escaped}/g ;" ${adr_filename}
+      sed -i "s/${source_filename_escaped}/${target_filename_escaped}/g ; s/${source_title_escaped}/${target_title_escaped}/g ;" ${adr_filename}
     fi
   done
 }
 
+#--- End Of move() function ---
+
 if [ -d $adr_dir ]
 then
-  count=`find $adr_dir | grep -E "^$adr_dir/[0-9]+-[^/]*\\.md" | we -l | xargs`
+  count=`find $adr_dir | grep -E "^$adr_dir/[0-9]+-[^/]*\\.md" | wc -l | xargs`
 else
   echo "The $adr_dir directory does not exist"
   exit 1
@@ -70,24 +74,24 @@ fi
 
 end=`expr $count + 1`
 
-move $l $end
+move $1 $end
 
-#Let's also rename all subsequence files so that they're still numbered in the correct order
+#Let's also rename all subsequent files so that they're still numbered in the correct order
 if test $1 -gt $2
 then
-  before=$(expr  $1 - 1)
-  for i in $(seq $before $2) ;
+  before=$(expr $1 - 1)
+  for i in $(seq $before $2);
   do
   plusone=$(expr  $i + 1)
   move $1 $plusone
   done
   move $end $2
 else
-after=$(expr $1 + 1)
+  after=$(expr $1 + 1)
 for i in $(seq $after $2);
 do
-minusone=$(expr  $i - 1)
-move $1 $minusone
+  minusone=$(expr $i - 1)
+  move $1 $minusone
 done
 move $end $2
 fi
