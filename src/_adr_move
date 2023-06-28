@@ -83,7 +83,7 @@ then
   for i in $(seq $before $2);
   do
   plusone=$(expr $i + 1)
-  move $1 $plusone
+  move $i $plusone
   done
   move $end $2
 else
@@ -91,7 +91,7 @@ else
 for i in $(seq $after $2);
 do
   minusone=$(expr $i - 1)
-  move $1 $minusone
+  move $i $minusone
 done
 move $end $2
 fi
