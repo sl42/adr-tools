@@ -58,6 +58,7 @@ echo "newtitle      : $newtitle"
 echo "slug          : $slug"
 echo "dstfile       : $dstfile"
 echo "srcfile       : $srcfile"
+
 # change all links to this renamed file
 for curr_file in $(grep -El "\]\($(basename $srcfile)\)" $dstdir/*.md) ; do
     echo "curr_file : '$curr_file' ..."
@@ -67,6 +68,8 @@ done
 
 # change the header of the file
 sed -E --in-place=".md.orig" "s|# $givennum\. .*|# $givennum\. $newtitle|" $dstfile
+
+
 #echo "found number  : $givennum"
 #echo "ID to look for: '$id'"
 #echo "Read new title: '$newtitle'"
