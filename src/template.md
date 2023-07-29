@@ -2,6 +2,9 @@
 
 Date: DATE
 
+- [Table Of All ADRs](toc.md)
+- [Graph Of All ADRs](graph.svg)
+
 ## Status
 
 STATUS
